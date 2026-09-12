@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unikey Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark">◆</span>
+        <span class="brand-name">Unikey Chat</span>
+      </div>
+      <button id="reset-btn" class="reset-btn" title="Mulai obrolan baru">Obrolan baru</button>
+    </header>
+
+    <main id="chat-window" class="chat-window">
+      <div class="empty-state" id="empty-state">
+        <p>Belum ada pesan. Tulis sesuatu untuk memulai.</p>
+      </div>
+    </main>
+
+    <form id="chat-form" class="chat-form">
+      <textarea
+        id="chat-input"
+        class="chat-input"
+        placeholder="Tulis pesan..."
+        rows="1"
+        autofocus
+      ></textarea>
+      <button type="submit" id="send-btn" class="send-btn">Kirim</button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
