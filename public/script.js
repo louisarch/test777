@@ -81,16 +81,20 @@ chatForm.addEventListener("submit", async (e) => {
 
     typingEl.remove();
 
-    if (!res.ok) {
+        if (!res.ok) {
       let msg = `Error ${res.status}`;
       try {
         const d = await res.json();
         msg = d.error || msg;
-        if (d.detail) console.log("detail:", d.detail);
+        if (d.detail) {
+          const det = typeof d.detail === "string" ? d.detail : JSON.stringify(d.detail);
+          msg += `\n\nDETAIL: ${det.slice(0, 400)}`;
+        }
       } catch {}
       addMessage("error", msg);
       return;
     }
+
 
     // Baca stream SSE
     const msgEl = addMessage("assistant", "");
