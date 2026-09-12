@@ -91,7 +91,8 @@ chatForm.addEventListener("submit", async (e) => {
     history.push({ role: "assistant", content: data.reply });
   } catch (err) {
     typingEl.remove();
-    addMessage("error", "Tidak bisa menghubungi server. Coba lagi.");
+    console.error(err);
+    addMessage("error", `Tidak bisa menghubungi server: ${err.message}`);
   } finally {
     sendBtn.disabled = false;
     chatInput.focus();
