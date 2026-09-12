@@ -1,17 +1,14 @@
 // functions/api/chat.js
 //
-// Cloudflare Pages Function — proxy ke API getunikey.ai, sekaligus
-// menyimpan pesan user & balasan asisten ke D1 supaya riwayat chat tersimpan.
-
-import { verifySession } from "../_lib/session.js";
+// Cloudflare Pages Function — jalan otomatis di edge saat ada request ke /api/chat
+// Tugasnya: terima pesan dari frontend, teruskan ke API getunikey.ai, kirim balik jawabannya.
+// API key TIDAK ditulis di sini. Diambil dari env.UNIKEY_API_KEY (Cloudflare secret).
+//
+// Catatan: versi ini TIDAK butuh login/database. Fitur auth + D1 (session.js,
+// functions/api/auth/*, functions/api/conversations/*) belum dipakai di versi ini.
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-
-  const uid = await verifySession(request.headers.get("Cookie"), env.SESSION_SECRET);
-  if (!uid) {
-    return jsonResponse({ error: "Kamu harus login dulu." }, 401);
-  }
 
   let body;
   try {
@@ -20,7 +17,7 @@ export async function onRequestPost(context) {
     return jsonResponse({ error: "Body request harus JSON valid." }, 400);
   }
 
-  const { messages, model, conversationId } = body;
+  const { messages, model } = body;
 
   if (!Array.isArray(messages) || messages.length === 0) {
     return jsonResponse({ error: "Field 'messages' wajib diisi (array)." }, 400);
@@ -32,32 +29,6 @@ export async function onRequestPost(context) {
       500
     );
   }
-
-  // Pastikan conversation ini milik user yang login, atau buat baru kalau belum ada
-  let convoId = conversationId;
-  if (convoId) {
-    const convo = await env.DB.prepare("SELECT id FROM conversations WHERE id = ? AND user_id = ?")
-      .bind(convoId, uid)
-      .first();
-    if (!convo) return jsonResponse({ error: "Obrolan tidak ditemukan." }, 404);
-  } else {
-    const lastUserMessage = messages[messages.length - 1];
-    const title = (lastUserMessage.content || "Obrolan baru").slice(0, 40);
-    const inserted = await env.DB.prepare(
-      "INSERT INTO conversations (user_id, title) VALUES (?, ?) RETURNING id"
-    )
-      .bind(uid, title)
-      .first();
-    convoId = inserted.id;
-  }
-
-  // Simpan pesan user (pesan terakhir dalam array) ke database
-  const lastUserMessage = messages[messages.length - 1];
-  await env.DB.prepare(
-    "INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)"
-  )
-    .bind(convoId, lastUserMessage.role, lastUserMessage.content)
-    .run();
 
   try {
     const upstreamResponse = await fetch("https://api.getunikey.ai/v1/chat/completions", {
@@ -78,7 +49,6 @@ export async function onRequestPost(context) {
     try {
       data = JSON.parse(rawText);
     } catch (parseErr) {
-      // Responsnya bukan JSON biasa (mungkin format stream/SSE walau sudah minta stream:false)
       return jsonResponse(
         {
           error: "Respons dari getunikey.ai bukan format JSON yang diharapkan.",
@@ -97,14 +67,7 @@ export async function onRequestPost(context) {
 
     const reply = data?.choices?.[0]?.message?.content ?? "";
 
-    // Simpan balasan asisten ke database
-    await env.DB.prepare(
-      "INSERT INTO messages (conversation_id, role, content) VALUES (?, 'assistant', ?)"
-    )
-      .bind(convoId, reply)
-      .run();
-
-    return jsonResponse({ reply, conversationId: convoId });
+    return jsonResponse({ reply, raw: data });
   } catch (err) {
     return jsonResponse({ error: "Terjadi kesalahan saat menghubungi getunikey.ai.", detail: String(err) }, 502);
   }
