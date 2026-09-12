@@ -63,6 +63,28 @@ body {
   letter-spacing: 0.2px;
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.model-select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text-dim2);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.model-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 .reset-btn {
   background: transparent;
   border: 1px solid var(--border);
