@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
         Authorization: `Bearer ${env.UNIKEY_API_KEY}`,
       },
       body: JSON.stringify({
-        model: model || env.UNIKEY_MODEL || "gpt-4o-mini",
+        model: model || env.UNIKEY_MODEL || "kimi-k3",
         messages,
       }),
     });
