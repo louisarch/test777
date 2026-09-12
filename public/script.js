@@ -4,6 +4,7 @@ const chatForm = document.getElementById("chat-form");
 const chatInput = document.getElementById("chat-input");
 const sendBtn = document.getElementById("send-btn");
 const resetBtn = document.getElementById("reset-btn");
+const modelSelect = document.getElementById("model-select");
 
 // Riwayat percakapan disimpan di memori tab ini saja (hilang saat reload).
 let history = [];
@@ -49,7 +50,7 @@ chatForm.addEventListener("submit", async (e) => {
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: history }),
+      body: JSON.stringify({ messages: history, model: modelSelect.value }),
     });
 
     const data = await res.json();
