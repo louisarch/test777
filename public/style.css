@@ -1,15 +1,15 @@
 :root {
-  --bg: #0f1115;
-  --bg-glow: #171c2e;
-  --panel: #171a20;
-  --panel-raised: #1e222a;
-  --border: #262b34;
-  --text: #edeef2;
-  --text-dim: #8b8fa3;
-  --text-dim2: #666b7a;
-  --accent: #5b5fef;
-  --accent-2: #ff6b4a;
-  --user-bubble: #23283a;
+  --bg: #1a1410;
+  --bg-glow: #2a1f16;
+  --panel: #241c16;
+  --panel-raised: #2e241b;
+  --border: #3d3025;
+  --text: #f5ece1;
+  --text-dim: #b3a08a;
+  --text-dim2: #7d6c58;
+  --accent: #e8935a;
+  --accent-2: #c14e3a;
+  --user-bubble: #34281c;
   --radius-lg: 18px;
   --radius-sm: 6px;
   --font-display: "Space Grotesk", -apple-system, sans-serif;
@@ -55,13 +55,47 @@ body {
   gap: 10px;
 }
 
-.brand-orb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, var(--accent-2), var(--accent) 70%);
-  box-shadow: 0 0 18px 2px rgba(91, 95, 239, 0.45);
+.brand-logo {
+  position: relative;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 147, 90, 0.4), transparent 70%);
+  animation: breathe 3.2s ease-in-out infinite;
+}
+
+.logo-svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 6px rgba(193, 78, 58, 0.4));
+}
+
+.arch-path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: draw-arch 1.1s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+}
+
+@keyframes draw-arch {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(0.92); opacity: 0.7; }
+  50% { transform: scale(1.08); opacity: 1; }
 }
 
 .brand-name {
@@ -98,7 +132,7 @@ body {
 }
 
 .model-btn.active {
-  background: linear-gradient(135deg, var(--accent), #4548c9);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #fff;
 }
 
@@ -255,7 +289,7 @@ body {
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--accent), #4548c9);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   border: none;
   color: #fff;
   border-radius: 50%;
