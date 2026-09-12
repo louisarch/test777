@@ -1,15 +1,15 @@
 :root {
-  --bg: #1a1410;
-  --bg-glow: #2a1f16;
-  --panel: #241c16;
-  --panel-raised: #2e241b;
-  --border: #3d3025;
-  --text: #f5ece1;
-  --text-dim: #b3a08a;
-  --text-dim2: #7d6c58;
+  --bg: #0d0c0b;
+  --bg-glow: #17140f;
+  --panel: #161512;
+  --panel-raised: #201d19;
+  --border: #2c2822;
+  --text: #f0ece4;
+  --text-dim: #a89e91;
+  --text-dim2: #726b60;
   --accent: #e8935a;
   --accent-2: #c14e3a;
-  --user-bubble: #34281c;
+  --user-bubble: #2c2016;
   --radius-lg: 18px;
   --radius-sm: 6px;
   --font-display: "Space Grotesk", -apple-system, sans-serif;
