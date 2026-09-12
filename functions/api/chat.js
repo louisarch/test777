@@ -1,19 +1,10 @@
-// functions/api/chat.js
-//
-// Cloudflare Pages Function — jalan otomatis di edge saat ada request ke /api/chat
-// Tugasnya: terima pesan dari frontend, teruskan ke API getunikey.ai, kirim balik jawabannya.
-// API key TIDAK ditulis di sini. Diambil dari env.UNIKEY_API_KEY (Cloudflare secret).
-//
-// Catatan: versi ini TIDAK butuh login/database. Fitur auth + D1 (session.js,
-// functions/api/auth/*, functions/api/conversations/*) belum dipakai di versi ini.
-
 export async function onRequestPost(context) {
   const { request, env } = context;
 
   let body;
   try {
     body = await request.json();
-  } catch (err) {
+  } catch {
     return jsonResponse({ error: "Body request harus JSON valid." }, 400);
   }
 
@@ -30,62 +21,51 @@ export async function onRequestPost(context) {
     );
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
+  let upstream;
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
-
-    let upstreamResponse;
-    try {
-      upstreamResponse = await fetch("https://api.getunikey.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${env.UNIKEY_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: model || env.UNIKEY_MODEL || "kimi-k3",
-          messages,
-          stream: false,
-        }),
-        signal: controller.signal,
-      });
-    } finally {
-      clearTimeout(timeout);
-    }
-
-    const rawText = await upstreamResponse.text();
-    let data;
-    try {
-      data = JSON.parse(rawText);
-    } catch (parseErr) {
-      return jsonResponse(
-        {
-          error: "Respons dari getunikey.ai bukan format JSON yang diharapkan.",
-          detail: rawText.slice(0, 500),
-        },
-        502
-      );
-    }
-
-    if (!upstreamResponse.ok) {
-      return jsonResponse(
-        { error: data?.error?.message || "Gagal memanggil API getunikey.ai.", detail: data },
-        upstreamResponse.status
-      );
-    }
-
-    const reply = data?.choices?.[0]?.message?.content ?? "";
-
-    return jsonResponse({ reply, raw: data });
+    upstream = await fetch("https://api.getunikey.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.UNIKEY_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: model || env.UNIKEY_MODEL || "kimi-k3",
+        messages,
+        stream: true,
+      }),
+      signal: controller.signal,
+    });
   } catch (err) {
+    clearTimeout(timeout);
     if (err.name === "AbortError") {
-      return jsonResponse(
-        { error: "getunikey.ai tidak merespons dalam 20 detik (timeout). API mereka mungkin butuh mode streaming." },
-        504
-      );
+      return jsonResponse({ error: "getunikey.ai tidak merespons dalam 25 detik (timeout)." }, 504);
     }
-    return jsonResponse({ error: "Terjadi kesalahan saat menghubungi getunikey.ai.", detail: String(err) }, 502);
+    return jsonResponse({ error: "Gagal menghubungi getunikey.ai.", detail: String(err) }, 502);
   }
+
+  // Headers sudah diterima = upstream merespons, streaming akan mengalir
+  clearTimeout(timeout);
+
+  if (!upstream.ok || !upstream.body) {
+    const text = await upstream.text();
+    return jsonResponse(
+      { error: "getunikey.ai menolak request.", detail: text.slice(0, 500) },
+      upstream.status
+    );
+  }
+
+  // Teruskan aliran SSE apa adanya ke frontend
+  return new Response(upstream.body, {
+    headers: {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache",
+      "X-Accel-Buffering": "no",
+    },
+  });
 }
 
 function jsonResponse(payload, status = 200) {
