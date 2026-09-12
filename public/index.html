@@ -3,29 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Unikey Chat</title>
+  <title>Unikey — Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app">
     <header class="app-header">
       <div class="brand">
-        <span class="brand-mark">◆</span>
-        <span class="brand-name">Unikey Chat</span>
+        <span class="brand-orb"></span>
+        <span class="brand-name">Unikey</span>
       </div>
-      <div class="header-controls">
-        <select id="model-select" class="model-select">
-          <option value="kimi-k3">kimi-k3</option>
-          <option value="kimi-k2.7-code">kimi-k2.7-code</option>
-          <option value="kimi-k2.6">kimi-k2.6</option>
-        </select>
-        <button id="reset-btn" class="reset-btn" title="Mulai obrolan baru">Obrolan baru</button>
+
+      <div class="model-switch" id="model-switch" role="tablist" aria-label="Pilih model">
+        <button type="button" class="model-btn active" data-model="kimi-k3">k3</button>
+        <button type="button" class="model-btn" data-model="kimi-k2.7-code">k2.7-code</button>
+        <button type="button" class="model-btn" data-model="kimi-k2.6">k2.6</button>
       </div>
     </header>
 
     <main id="chat-window" class="chat-window">
-      <div class="empty-state" id="empty-state">
-        <p>Belum ada pesan. Tulis sesuatu untuk memulai.</p>
+      <div class="hero" id="hero">
+        <h1>Ada yang bisa dibantu?</h1>
+        <p>Tanya apa saja — jawabannya diproses lewat model Kimi yang kamu pilih di atas.</p>
+        <div class="chip-row">
+          <button type="button" class="chip">Jelaskan konsep OOP dengan analogi</button>
+          <button type="button" class="chip">Ide judul skripsi RPL</button>
+          <button type="button" class="chip">Review potongan kode</button>
+          <button type="button" class="chip">Bikin draft email formal</button>
+        </div>
       </div>
     </main>
 
@@ -37,7 +45,11 @@
         rows="1"
         autofocus
       ></textarea>
-      <button type="submit" id="send-btn" class="send-btn">Kirim</button>
+      <button type="submit" id="send-btn" class="send-btn" aria-label="Kirim">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 12L20 4L14 20L11 13L4 12Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </form>
   </div>
 
