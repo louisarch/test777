@@ -31,18 +31,27 @@ export async function onRequestPost(context) {
   }
 
   try {
-    const upstreamResponse = await fetch("https://api.getunikey.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${env.UNIKEY_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: model || env.UNIKEY_MODEL || "kimi-k3",
-        messages,
-        stream: false,
-      }),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+
+    let upstreamResponse;
+    try {
+      upstreamResponse = await fetch("https://api.getunikey.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${env.UNIKEY_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: model || env.UNIKEY_MODEL || "kimi-k3",
+          messages,
+          stream: false,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const rawText = await upstreamResponse.text();
     let data;
@@ -69,6 +78,12 @@ export async function onRequestPost(context) {
 
     return jsonResponse({ reply, raw: data });
   } catch (err) {
+    if (err.name === "AbortError") {
+      return jsonResponse(
+        { error: "getunikey.ai tidak merespons dalam 20 detik (timeout). API mereka mungkin butuh mode streaming." },
+        504
+      );
+    }
     return jsonResponse({ error: "Terjadi kesalahan saat menghubungi getunikey.ai.", detail: String(err) }, 502);
   }
 }
