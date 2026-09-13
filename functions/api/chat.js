@@ -33,7 +33,7 @@ export async function onRequestPost(context) {
         Authorization: `Bearer ${env.UNIKEY_API_KEY}`,
       },
       body: JSON.stringify({
-        model: model || env.UNIKEY_MODEL || "kimi-k3",
+        model: model || env.UNIKEY_MODEL || "moonshotai/kimi-k3",
         messages,
         stream: true,
       }),
