@@ -5,7 +5,7 @@ const chatInput = document.getElementById("chat-input");
 const sendBtn = document.getElementById("send-btn");
 const modelSwitch = document.getElementById("model-switch");
 
-let selectedModel = "kimi-k3";
+let selectedModel = "moonshotai/kimi-k3";
 let history = [];
 
 // Ganti model aktif lewat pill selector
