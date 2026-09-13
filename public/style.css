@@ -43,9 +43,9 @@ body {
 /* Header */
 .app-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px 16px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px 14px;
   flex-shrink: 0;
 }
 
@@ -110,8 +110,15 @@ body {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 3px;
+  padding: 4px;
   gap: 2px;
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: none;
+}
+
+.model-switch::-webkit-scrollbar {
+  display: none;
 }
 
 .model-btn {
@@ -121,9 +128,11 @@ body {
   font-family: var(--font-body);
   font-size: 12.5px;
   font-weight: 500;
-  padding: 6px 12px;
+  padding: 7px 13px;
   border-radius: 999px;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: background 0.18s ease, color 0.18s ease;
 }
 
