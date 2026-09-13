@@ -171,7 +171,13 @@ chatForm.addEventListener("submit", async (e) => {
         if (data === "[DONE]") continue;
         try {
           const j = JSON.parse(data);
-          const delta = j.choices?.[0]?.delta?.content ?? "";
+          // Dua kemungkinan format dari Workers AI, tergantung modelnya:
+          // 1. Format ala-OpenAI: { choices: [{ delta: { content: "..." } }] }
+          // 2. Format native Workers AI: { response: "..." }
+          let delta = j.choices?.[0]?.delta?.content;
+          if (delta === undefined || delta === null) {
+            delta = j.response ?? "";
+          }
           if (delta) {
             reply += delta;
             msgEl.textContent = reply;
