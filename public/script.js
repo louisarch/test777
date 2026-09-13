@@ -5,7 +5,7 @@ const chatInput = document.getElementById("chat-input");
 const sendBtn = document.getElementById("send-btn");
 const modelSwitch = document.getElementById("model-switch");
 
-let selectedModel = "moonshotai/kimi-k3";
+let selectedModel = "@cf/meta/llama-3.1-8b-instruct";
 let history = [];
 
 // Ganti model aktif lewat pill selector
@@ -81,7 +81,7 @@ chatForm.addEventListener("submit", async (e) => {
 
     typingEl.remove();
 
-        if (!res.ok) {
+    if (!res.ok) {
       let msg = `Error ${res.status}`;
       try {
         const d = await res.json();
@@ -95,8 +95,7 @@ chatForm.addEventListener("submit", async (e) => {
       return;
     }
 
-
-    // Baca stream SSE
+    // Baca stream SSE dari Workers AI
     const msgEl = addMessage("assistant", "");
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
